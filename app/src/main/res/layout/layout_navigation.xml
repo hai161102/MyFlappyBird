@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/game_color"
+        android:padding="12dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings"
+            android:textSize="24sp"
+            android:fontFamily="monospace"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"
+            android:textColor="@color/app_38"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@drawable/shape_button_setting"
+            android:id="@+id/displaySetting">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/soundCheck">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/soundImg"
+                    android:src="@drawable/sound"
+                    />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text="@string/sound"
+                    android:paddingHorizontal="12dp"
+                    android:textStyle="normal"
+                    android:textSize="20sp"
+                    android:textColor="@color/app_38"
+                    android:layout_marginHorizontal="12dp"/>
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/soundSwitch"
+                    android:thumb="@drawable/bird_icon"
+                    android:trackTint="@color/game_color"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</layout>
