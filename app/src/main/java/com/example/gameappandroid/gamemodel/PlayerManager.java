@@ -1,22 +1,14 @@
 package com.example.gameappandroid.gamemodel;
 
 import android.content.Context;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.media.AudioRouting;
 import android.media.MediaPlayer;
-import android.media.TimedMetaData;
 import android.os.Build;
-import android.os.Handler;
-import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
 
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.interfaces.PlayerListener;
-import com.haiprj.base.BaseEntity;
-
-import java.io.IOException;
+import com.haiprj.base.widget.BaseEntity;
 
 public class PlayerManager extends BaseEntity {
     public boolean isJump = false;

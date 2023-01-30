@@ -25,15 +25,13 @@ import com.example.gameappandroid.gameutils.GameUtils;
 import com.example.gameappandroid.interfaces.GameListener;
 import com.example.gameappandroid.interfaces.PlayerListener;
 import com.example.gameappandroid.ui.activity.MainActivity;
+import com.haiprj.base.widget.BaseGameFrame;
 
 import java.io.IOException;
 import java.util.Random;
 
 @SuppressWarnings("ALL")
-public class GameFrame extends FrameLayout implements Runnable, View.OnTouchListener {
-
-    public Thread gameThread;
-    private final int FPS = 60;
+public class GameFrame extends BaseGameFrame {
 
     private int SCREEN_WIDTH;
     private int SCREEN_HEIGHT;
@@ -52,52 +50,27 @@ public class GameFrame extends FrameLayout implements Runnable, View.OnTouchList
     private Random random;
     float countLenght = 0;
 
-    private boolean isGameOver = false;
-
     private MediaPlayer deathSound;
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            if (!isGameOver){
-                update();
-                //updateViewLayout();
-                GameFrame.this.invalidate();
-                GameFrame.this.postDelayed(runnable, 100/FPS);
-            }
+    public GameFrame(@NonNull Context context) {
+        super(context);
+    }
 
-        }
-    };
+    public GameFrame(@NonNull Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
 
-    private void updateViewLayout() {
-        if (getChildCount() > 0)
-            for (int i = 0; i < getChildCount(); i++) {
-                this.updateViewLayout(this.getChildAt(i), this.getChildAt(i).getLayoutParams());
-            }
+    public GameFrame(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    public GameFrame(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
     }
 
     private int entityHeight;
     private int entityWidth;
 
-    public GameFrame(@NonNull Context context) {
-        super(context);
-        init();
-    }
-
-    public GameFrame(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public GameFrame(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    public GameFrame(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        init();
-    }
 
 
     public void setGameListener(GameListener gameListener) {
@@ -105,7 +78,9 @@ public class GameFrame extends FrameLayout implements Runnable, View.OnTouchList
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void init(){
+    @Override
+    protected void init(){
+        super.init();
         deathSound = MediaPlayer.create(getContext(), R.raw.death_sound);
 
         deathSound.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -127,7 +102,6 @@ public class GameFrame extends FrameLayout implements Runnable, View.OnTouchList
         //initOtherBackground();
         ballImageView = new GamePlayerView(getContext(), playerManager);
         this.addView(ballImageView, 0);
-        this.setOnTouchListener(this);
     }
 
     private void setLayout() {
@@ -189,46 +163,14 @@ public class GameFrame extends FrameLayout implements Runnable, View.OnTouchList
         playerManager.worldY = MainActivity.screenHeight / 2;
         playerManager.setMediaPlayer(getContext());
     }
-
-
-    public void start(){
-//        gameThread = new Thread(this);
-//        gameThread.start();
-        this.post(runnable);
-    }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
     }
 
     @Override
-    public void run() {
-        double drawInterval = 1000000000f / FPS;
-        double nextTime = System.nanoTime() + drawInterval;
-
-        while (this.gameThread != null) {
-            ((Activity) getContext()).runOnUiThread(runnable);
-
-            try {
-                double remainTime = nextTime - System.nanoTime();
-                remainTime /= 1000000;
-                if (remainTime < 0) {
-                    remainTime = 0;
-                }
-
-                //noinspection BusyWait
-                Thread.sleep((long) remainTime);
-                nextTime += drawInterval;
-
-            } catch (Exception ignored) {
-
-            }
-
-        }
-    }
-
-    public void update() {
-
+    protected void update() {
+        super.update();
         this.playerManager.update();
         this.ballImageView.update();
         for (int i = 0; i  < gameEntityViews.length; i++){
@@ -237,7 +179,6 @@ public class GameFrame extends FrameLayout implements Runnable, View.OnTouchList
                 deathSound.start();
             }
         }
-
         if (playerManager.getY() >= MainActivity.screenHeight || playerManager.getY() <= 0){
             gameOver();
         }
@@ -264,30 +205,31 @@ public class GameFrame extends FrameLayout implements Runnable, View.OnTouchList
 
     private void gameOver() {
         isGameOver = true;
-        gameListener.onOver();
+        gameListener.onOver(playerManager);
         playerManager.stopSound();
     }
 
     private void gameWin() {
         gameListener.onWin(playerManager);
-        gameThread.interrupt();
     }
 
     @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-        switch (motionEvent.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                playerManager.canUp = true;
-                playerManager.canDown = false;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                break;
-            case MotionEvent.ACTION_UP:
-                playerManager.canUp = false;
-                playerManager.canDown = true;
-                break;
-        }
-        return true;
+    protected void onTouchDown(View view) {
+        super.onTouchDown(view);
+        playerManager.canUp = true;
+        playerManager.canDown = false;
+    }
+
+    @Override
+    protected void onTouchMove(View view) {
+        super.onTouchMove(view);
+    }
+
+    @Override
+    protected void onTouchUp(View view) {
+        super.onTouchUp(view);
+        playerManager.canUp = false;
+        playerManager.canDown = true;
     }
 
     private int getRandomPostionSpawn(int lenght, int startPoint){
@@ -295,8 +237,9 @@ public class GameFrame extends FrameLayout implements Runnable, View.OnTouchList
         return pos;
     }
 
+    @Override
     public void destroy(){
+        super.destroy();
         this.playerManager.releaseSound();
-        this.gameThread.currentThread().interrupt();
     }
 }

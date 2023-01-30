@@ -1,4 +1,4 @@
-package com.haiprj.base;
+package com.haiprj.base.widget;
 
 import android.graphics.Rect;
 import android.graphics.RectF;

@@ -1,4 +1,4 @@
-package com.haiprj.base;
+package com.haiprj.base.widget;
 
 import android.app.Activity;
 import android.content.Context;

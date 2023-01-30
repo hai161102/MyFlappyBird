@@ -5,5 +5,5 @@ import com.example.gameappandroid.gamemodel.PlayerManager;
 public interface GameListener {
 
     void onWin(PlayerManager playerManager);
-    void onOver();
+    void onOver(PlayerManager playerManager);
 }

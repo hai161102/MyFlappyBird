@@ -1,4 +1,4 @@
-package com.haiprj.base;
+package com.haiprj.base.view;
 
 import android.os.Bundle;
 import android.view.Window;

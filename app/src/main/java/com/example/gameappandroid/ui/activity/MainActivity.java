@@ -1,20 +1,17 @@
 package com.example.gameappandroid.ui.activity;
 
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.widget.CompoundButton;
 
 import com.example.gameappandroid.Const;
 import com.example.gameappandroid.ui.adapter.GameMenuAdapter;
-import com.haiprj.base.BaseActivity;
+import com.haiprj.base.view.BaseActivity;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.databinding.ActivityMainBinding;
-import com.haiprj.base.BaseAdapter;
-import com.haiprj.base.BaseViewHolder;
+import com.haiprj.base.view.BaseAdapter;
 import com.haiprj.base.utils.GameSharePreference;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {

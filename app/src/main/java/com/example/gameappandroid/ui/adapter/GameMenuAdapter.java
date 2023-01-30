@@ -1,22 +1,16 @@
 package com.example.gameappandroid.ui.adapter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.gameappandroid.R;
 import com.example.gameappandroid.databinding.ItemMenuBinding;
-import com.haiprj.base.BaseAdapter;
-import com.haiprj.base.BaseViewHolder;
+import com.haiprj.base.view.BaseAdapter;
+import com.haiprj.base.view.BaseViewHolder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GameMenuAdapter extends BaseAdapter<ItemMenuBinding, String> {

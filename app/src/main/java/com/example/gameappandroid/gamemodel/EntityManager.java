@@ -1,9 +1,6 @@
 package com.example.gameappandroid.gamemodel;
 
-import android.graphics.Rect;
-import android.graphics.RectF;
-
-import com.haiprj.base.BaseEntity;
+import com.haiprj.base.widget.BaseEntity;
 
 public class EntityManager extends BaseEntity {
 

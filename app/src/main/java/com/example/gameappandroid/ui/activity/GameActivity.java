@@ -1,20 +1,21 @@
 package com.example.gameappandroid.ui.activity;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 
-import com.haiprj.base.BaseActivity;
+import com.example.gameappandroid.ui.dialog.DeathDialog;
+import com.haiprj.base.view.BaseActivity;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.databinding.ActivityGameBinding;
 import com.example.gameappandroid.gamemodel.PlayerManager;
 import com.example.gameappandroid.interfaces.GameListener;
-import com.example.gameappandroid.interfaces.OnActionCallback;
-import com.example.gameappandroid.ui.dialog.FinishDialog;
 
 import java.util.Objects;
 
 public class GameActivity extends BaseActivity<ActivityGameBinding> {
 
+    Dialog dialog;
     public static void start(Context context) {
         Intent starter = new Intent(context, GameActivity.class);
         context.startActivity(starter);
@@ -30,24 +31,22 @@ public class GameActivity extends BaseActivity<ActivityGameBinding> {
         binding.gameFrame.setGameListener(new GameListener() {
             @Override
             public void onWin(PlayerManager playerManager) {
-                FinishDialog.start(GameActivity.this, new OnActionCallback() {
-                    @Override
-                    public void callback(String key, Object... objects) {
-                        if (Objects.equals(key, "OnOke"))
-                            finish();
+                DeathDialog deathDialog = new DeathDialog(GameActivity.this, GameActivity.this, (key, objects) -> {
+                    if (Objects.equals(key, "OnOke")){
+                        finish();
                     }
-                });
+                }, playerManager);
+                deathDialog.show();
             }
 
             @Override
-            public void onOver() {
-                FinishDialog.start(GameActivity.this, new OnActionCallback() {
-                    @Override
-                    public void callback(String key, Object... objects) {
-                        if (Objects.equals(key, "OnOke"))
-                            finish();
+            public void onOver(PlayerManager playerManager) {
+                DeathDialog deathDialog = new DeathDialog(GameActivity.this, GameActivity.this, (key, objects) -> {
+                    if (Objects.equals(key, "OnOke")){
+                        finish();
                     }
-                });
+                }, playerManager);
+                deathDialog.show();
             }
         });
 
