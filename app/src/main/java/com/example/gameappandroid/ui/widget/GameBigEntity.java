@@ -103,6 +103,10 @@ public class GameBigEntity extends BaseEntityView {
         this.setY(baseEntity.getY());
     }
 
+    public float getPointEmpty() {
+        return pointEmpty;
+    }
+
     private void remove() {
         entityListener.onRemove();
     }
@@ -113,10 +117,10 @@ public class GameBigEntity extends BaseEntityView {
         RectF rectF = ((GameView) this.getChildAt(index)).getEntity().getRectF();
         float w = rectF.width();
         float h = rectF.height();
-        rectF.left += this.getX();
-        rectF.top += this.getY();
-        rectF.right = rectF.left + w;
-        rectF.bottom = rectF.top + h;
+        rectF.left += (this.getX() + 10);
+        rectF.top += (this.getY() + 10);
+        rectF.right = rectF.left + w - 10;
+        rectF.bottom = rectF.top + h - 10;
         return rectF;
     }
 }

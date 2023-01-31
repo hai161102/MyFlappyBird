@@ -1,9 +1,7 @@
 package com.haiprj.base.view;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -13,13 +11,11 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
-import androidx.fragment.app.DialogFragment;
 
-import com.haiprj.R;
+import com.haiprj.base.utils.GameUtils;
 
 public abstract class BaseDialog<T> extends AppCompatDialog {
 
@@ -60,12 +56,13 @@ public abstract class BaseDialog<T> extends AppCompatDialog {
         WindowManager.LayoutParams params = window.getAttributes();
         params.gravity = Gravity.CENTER;
         window.setAttributes(params);
-        initView();
-        addEvent();
+
         setCancelable(true);
         setCanceledOnTouchOutside(true);
         setOnDismissListener(dialogInterface -> BaseDialog.this.onDismiss());
         setOnCancelListener(dialogInterface -> BaseDialog.this.onCancel());
+        initView();
+        addEvent();
     }
 
     protected abstract void addEvent();

@@ -1,19 +1,17 @@
 package com.example.gameappandroid.ui.widget;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.RectF;
 import android.media.MediaPlayer;
-import android.media.SoundPool;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,16 +20,14 @@ import com.example.gameappandroid.Const;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.gamemodel.EntityManager;
 import com.example.gameappandroid.gamemodel.PlayerManager;
-import com.example.gameappandroid.gameutils.GameMatrix;
-import com.example.gameappandroid.gameutils.GameUtils;
 import com.example.gameappandroid.interfaces.GameListener;
-import com.example.gameappandroid.interfaces.PlayerListener;
 import com.example.gameappandroid.ui.activity.MainActivity;
 import com.haiprj.base.interfaces.EntityListener;
 import com.haiprj.base.utils.GameSharePreference;
+import com.haiprj.base.utils.GameUtils;
 import com.haiprj.base.widget.BaseGameFrame;
+import com.pnikosis.materialishprogress.ProgressWheel;
 
-import java.io.IOException;
 import java.util.Random;
 
 @SuppressWarnings("ALL")
@@ -56,6 +52,8 @@ public class GameFrame extends BaseGameFrame {
 
     private MediaPlayer deathSound;
 
+    private GameTextView textView;
+
     public GameFrame(@NonNull Context context) {
         super(context);
     }
@@ -76,6 +74,8 @@ public class GameFrame extends BaseGameFrame {
     private int entityWidth;
 
 
+    private int numberProgressCount = 0;
+
 
     public void setGameListener(GameListener gameListener) {
         this.gameListener = gameListener;
@@ -85,6 +85,7 @@ public class GameFrame extends BaseGameFrame {
     @Override
     protected void init(){
         super.init();
+
         deathSound = MediaPlayer.create(getContext(), R.raw.death_sound);
 
         deathSound.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -106,11 +107,12 @@ public class GameFrame extends BaseGameFrame {
         //initOtherBackground();
         ballImageView = new GamePlayerView(getContext(), playerManager);
         this.addView(ballImageView, 0);
+        setupScoreView();
     }
 
     private void setLayout() {
 
-        entityWidth = (int) GameUtils.pxFromDp(getContext(), 80);
+        entityWidth = MainActivity.screenWidth / 15;
         entityHeight = (int) GameUtils.pxFromDp(getContext(), 32);
 
         LayoutParams layoutParams = new LayoutParams(MainActivity.screenWidth, MainActivity.screenHeight);
@@ -161,8 +163,8 @@ public class GameFrame extends BaseGameFrame {
         playerManager = new PlayerManager();
         playerManager.setX(MainActivity.screenWidth / 2f);
         playerManager.setY(MainActivity.screenHeight / 2f);
-        playerManager.setWidth((int) GameUtils.getDp(getContext(), (int) (24 * percent)));
-        playerManager.setHeight((int) GameUtils.getDp(getContext(), 24));
+        playerManager.setWidth((int) GameUtils.getDp(getContext(), (int) (180 * percent)));
+        playerManager.setHeight((int) GameUtils.getDp(getContext(), 180));
         playerManager.setPlayerSpeed(GameSharePreference.getInstance().getFloat(Const.PLAYER_SPEED, 6f));
         playerManager.setSpeedDown(8f);
         playerManager.setName("My Bird");
@@ -176,17 +178,23 @@ public class GameFrame extends BaseGameFrame {
         super.onDraw(canvas);
     }
 
+    private GameBigEntity entityOnDeath;
     @Override
     protected void update() {
         super.update();
         this.playerManager.update();
         this.ballImageView.update();
+        if (playerManager.worldX / 1000 > 0) {
+            playerManager.score = (int) (playerManager.worldX / 1000);
+            textView.setText(String.format(getContext().getString(R.string.dialog_score), playerManager.score));
+        }
         for (int i = 0; i  < gameEntityViews.length; i++){
             gameEntityViews[i].update(playerManager);
             if (RectF.intersects(playerManager.getRectF(), gameEntityViews[i].getChildRectF(0) )
                     || RectF.intersects(playerManager.getRectF(), gameEntityViews[i].getChildRectF(1) )
             ){
-                deathSound.start();
+                entityOnDeath = gameEntityViews[i];
+                gameOver();
             }
         }
         if (playerManager.getY() >= MainActivity.screenHeight || playerManager.getY() <= 0){
@@ -194,10 +202,43 @@ public class GameFrame extends BaseGameFrame {
         }
 
 
+
     }
 
 
+    public void playAgain(){
+        reset();
+    }
 
+    public void resumePlay(){
+
+        setupPlayerResume();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isGameOver = false;
+            }
+        }, 3000);
+    }
+
+    private void setupPlayerResume() {
+        if (entityOnDeath == null){
+            playerManager.setY(MainActivity.screenHeight / 2 - playerManager.getHeight() / 2);
+        }
+        else playerManager.setY(entityOnDeath.getPointEmpty() - playerManager.getHeight() / 2);
+        ballImageView.update();
+
+    }
+
+    private void reset(){
+        isGameOver = false;
+        this.removeAllViews();
+        initPlayer();
+        initBackground();
+        ballImageView = new GamePlayerView(getContext(), playerManager);
+        this.addView(ballImageView, 0);
+        setupScoreView();
+    }
     private float getHeightSpawnEntity(){
 
         final RectF fixRect = new RectF();
@@ -215,6 +256,9 @@ public class GameFrame extends BaseGameFrame {
 
     private void gameOver() {
         isGameOver = true;
+        if (playerManager.score > GameSharePreference.getInstance().getInt(Const.HIGHEST_SCORE_KEY, 0)){
+            GameSharePreference.getInstance().setInt(Const.HIGHEST_SCORE_KEY, playerManager.score);
+        }
         gameListener.onOver(playerManager);
         playerManager.stopSound();
     }
@@ -257,5 +301,20 @@ public class GameFrame extends BaseGameFrame {
         float oOT = space / 10f;
 
         return random.nextInt((int) (oOT * 2));
+    }
+
+    public void setupScoreView(){
+        textView = new GameTextView(getContext());
+        textView.setText(String.format(getContext().getString(R.string.dialog_score), playerManager.score));
+        textView.setBackgroundResource(R.drawable.shape_button);
+        textView.setTextColor(R.color.app_38);
+        textView.setTextSize(GameUtils.getDp(getContext(), 24));
+        textView.setX(0);
+        textView.setY(0);
+        LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(20, 20, 0, 0);
+        textView.setLayoutParams(layoutParams);
+        textView.setPadding(12, 12, 12, 12);
+        this.addView(textView);
     }
 }

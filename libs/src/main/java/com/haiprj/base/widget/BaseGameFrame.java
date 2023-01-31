@@ -19,8 +19,9 @@ public abstract class BaseGameFrame extends FrameLayout implements View.OnTouchL
             if (!isGameOver){
                 update();
                 BaseGameFrame.this.invalidate();
-                BaseGameFrame.this.postDelayed(this, 1000 / FPS);
             }
+            BaseGameFrame.this.postDelayed(this, 1000 / FPS);
+
         }
     };
 

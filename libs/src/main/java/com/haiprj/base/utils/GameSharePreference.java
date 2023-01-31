@@ -113,4 +113,10 @@ public class GameSharePreference {
         editor.putInt(key, value);
         editor.apply();
     }
+
+    public void setString(String key, String value) {
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(key, value);
+        editor.apply();
+    }
 }

@@ -8,4 +8,9 @@
     <string name="my_flappy_bird">My Flappy Bird</string>
     <string name="game_over">Game Over</string>
     <string name="speed">Speed</string>
+    <string name="dialog_score">Score: %d</string>
+    <string name="dialog_highest_score">Highest Score: %d</string>
+    <string name="player">Player</string>
+    <string name="play_again">Play again</string>
+    <string name="exit">Exit</string>
 </resources>

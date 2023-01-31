@@ -21,6 +21,8 @@ public class PlayerManager extends BaseEntity {
 
     private PlayerListener playerListener;
 
+    public int score = 0;
+
     public PlayerManager(String name, int imageId, int width, int height, float x, float y, float playerSpeed) {
         super(name, imageId, width, height, x, y);
         this.playerSpeed = playerSpeed;

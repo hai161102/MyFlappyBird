@@ -1,9 +1,7 @@
 package com.example.gameappandroid.ui.widget;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.SurfaceTexture;
@@ -16,7 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.gamemodel.PlayerManager;
-import com.example.gameappandroid.gameutils.GameUtils;
+import com.haiprj.base.utils.GameUtils;
 
 public class GameTexture extends TextureView implements TextureView.SurfaceTextureListener {
     private PlayerManager playerManager;

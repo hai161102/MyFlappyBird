@@ -74,10 +74,10 @@ public abstract class BaseEntity {
         this.y = y;
     }
     public Rect getRect() {
-        return new Rect((int) x, (int) y, (int) (x + width), (int) (y + height));
+        return new Rect((int) x + 10, (int) y + 10, (int) (x + width) - 10, (int) (y + height) - 10);
     }
 
     public RectF getRectF() {
-        return new RectF(x, y, (x + width), (y + height));
+        return new RectF(x + 10f, y + 10f, (x + width) - 10f, (y + height) - 10f);
     }
 }

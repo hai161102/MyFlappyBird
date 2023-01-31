@@ -1,14 +1,13 @@
 package com.example.gameappandroid.ui.widget;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
 
 import androidx.annotation.Nullable;
 
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.gamemodel.EntityManager;
-import com.example.gameappandroid.gameutils.GameUtils;
+import com.haiprj.base.utils.GameUtils;
 import com.haiprj.base.widget.BaseEntity;
 import com.haiprj.base.widget.BaseView;
 

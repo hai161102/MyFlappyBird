@@ -1,4 +1,4 @@
-package com.example.gameappandroid.gameutils;
+package com.haiprj.base.utils;
 
 import android.content.Context;
 
@@ -13,6 +13,6 @@ public class GameUtils {
     }
 
     public static int getDp(Context context,int i) {
-        return (int) pxFromDp(context, i);
+        return (int) dpFromPx(context, i);
     }
 }

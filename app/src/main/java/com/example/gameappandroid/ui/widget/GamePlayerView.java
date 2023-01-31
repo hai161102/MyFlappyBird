@@ -3,17 +3,15 @@ package com.example.gameappandroid.ui.widget;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.gamemodel.PlayerManager;
-import com.example.gameappandroid.gameutils.GameUtils;
+import com.haiprj.base.utils.GameUtils;
 
 public class GamePlayerView extends androidx.appcompat.widget.AppCompatImageView {
 
