@@ -64,7 +64,6 @@ public abstract class BaseDialog<T> extends AppCompatDialog {
         addEvent();
         setCancelable(true);
         setCanceledOnTouchOutside(true);
-
         setOnDismissListener(dialogInterface -> BaseDialog.this.onDismiss());
         setOnCancelListener(dialogInterface -> BaseDialog.this.onCancel());
     }
@@ -85,7 +84,17 @@ public abstract class BaseDialog<T> extends AppCompatDialog {
 
     }
 
+    public void showDialog(){
+        try {
+            show();
+        } catch (Exception e){
+
+        }
+    }
+
     public interface OnActionDialogCallback{
         void callback(String key, Object... objects);
     }
+
+
 }

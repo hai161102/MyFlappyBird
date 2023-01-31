@@ -9,9 +9,16 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.haiprj.base.interfaces.EntityListener;
+
 public abstract class BaseEntityView extends FrameLayout {
 
     protected BaseEntity baseEntity;
+    protected EntityListener entityListener;
+
+    public void setEntityListener(EntityListener entityListener) {
+        this.entityListener = entityListener;
+    }
 
     public BaseEntityView(@NonNull Context context, BaseEntity baseEntity) {
         super(context);
@@ -43,8 +50,6 @@ public abstract class BaseEntityView extends FrameLayout {
     }
 
     public void update(BaseEntity entity){
-        baseEntity.setX(baseEntity.worldX - entity.worldX + entity.getX());
-        baseEntity.setY(baseEntity.worldY - entity.worldY + entity.getY());
         invalidate();
     }
 
@@ -54,12 +59,13 @@ public abstract class BaseEntityView extends FrameLayout {
         ((Activity) getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                BaseEntityView.this.setX(baseEntity.getX());
-                BaseEntityView.this.setY(baseEntity.getY());
+                drawUI();
             }
         });
 
     }
+
+    protected abstract void drawUI();
 
     public BaseEntity getBaseEntity() {
         return baseEntity;

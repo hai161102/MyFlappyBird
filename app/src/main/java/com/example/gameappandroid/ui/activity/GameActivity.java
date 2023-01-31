@@ -31,22 +31,20 @@ public class GameActivity extends BaseActivity<ActivityGameBinding> {
         binding.gameFrame.setGameListener(new GameListener() {
             @Override
             public void onWin(PlayerManager playerManager) {
-                DeathDialog deathDialog = new DeathDialog(GameActivity.this, GameActivity.this, (key, objects) -> {
+                DeathDialog.getInstance(GameActivity.this, GameActivity.this, (key, objects) -> {
                     if (Objects.equals(key, "OnOke")){
-                        finish();
                     }
-                }, playerManager);
-                deathDialog.show();
+                }, playerManager).showDialog();
+
             }
 
             @Override
             public void onOver(PlayerManager playerManager) {
-                DeathDialog deathDialog = new DeathDialog(GameActivity.this, GameActivity.this, (key, objects) -> {
+
+                DeathDialog.getInstance(GameActivity.this, GameActivity.this, (key, objects) -> {
                     if (Objects.equals(key, "OnOke")){
-                        finish();
                     }
-                }, playerManager);
-                deathDialog.show();
+                }, playerManager).showDialog();
             }
         });
 

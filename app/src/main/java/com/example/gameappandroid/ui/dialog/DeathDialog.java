@@ -13,21 +13,43 @@ import com.haiprj.base.view.BaseDialog;
 
 public class DeathDialog extends BaseDialog<DialogFinishBinding> {
 
+    private static DeathDialog instance;
     private PlayerManager playerManager;
 
-    public DeathDialog(@NonNull Context context, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager) {
+    private DeathDialog(@NonNull Context context, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager) {
         super(context, activity, onActionDialogCallback);
         this.playerManager = playerManager;
     }
 
-    public DeathDialog(@NonNull Context context, int themeResId, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager) {
+    private DeathDialog(@NonNull Context context, int themeResId, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager) {
         super(context, themeResId, activity, onActionDialogCallback);
         this.playerManager = playerManager;
     }
 
-    public DeathDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager) {
+    private DeathDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager) {
         super(context, cancelable, cancelListener, activity, onActionDialogCallback);
         this.playerManager = playerManager;
+    }
+
+    public static DeathDialog getInstance(@NonNull Context context, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager){
+        if (instance == null){
+            instance = new DeathDialog(context, activity, onActionDialogCallback, playerManager);
+        }
+        return instance;
+    }
+
+    public static DeathDialog getInstance(@NonNull Context context, int themeResId, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager){
+        if (instance == null){
+            instance = new DeathDialog(context, activity, onActionDialogCallback, playerManager);
+        }
+        return instance;
+    }
+
+    public static DeathDialog getInstance(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener, Activity activity, OnActionDialogCallback onActionDialogCallback, PlayerManager playerManager){
+        if (instance == null){
+            instance = new DeathDialog(context, activity, onActionDialogCallback, playerManager);
+        }
+        return instance;
     }
 
 
@@ -45,6 +67,7 @@ public class DeathDialog extends BaseDialog<DialogFinishBinding> {
         binding.imageDialog.setImageResource(playerManager.getImageId());
         binding.title.setText(R.string.game_over);
         binding.score.setText("0");
+        setCanceledOnTouchOutside(false);
     }
 
     @Override

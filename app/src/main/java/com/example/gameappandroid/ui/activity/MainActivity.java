@@ -2,6 +2,9 @@ package com.example.gameappandroid.ui.activity;
 
 import android.util.DisplayMetrics;
 import android.widget.CompoundButton;
+import android.widget.SeekBar;
+
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.gameappandroid.Const;
 import com.example.gameappandroid.ui.adapter.GameMenuAdapter;
@@ -19,11 +22,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private DisplayMetrics displayMetrics;
     private GameMenuAdapter gameMenuAdapter;
 
+    private float gamePlayerSpeed = 6f;
     public static int screenWidth;
     public static int screenHeight;
     @Override
     protected void initView() {
         GameSharePreference.getInstance().init(this);
+        gamePlayerSpeed = GameSharePreference.getInstance().getFloat(Const.PLAYER_SPEED, 6f);
         if (GameSharePreference.getInstance().getBoolean(Const.SOUND_CHECK_KEY, false)){
             openSound();
         }
@@ -36,6 +41,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         screenHeight = displayMetrics.heightPixels;
         gameMenuAdapter = new GameMenuAdapter(this, getListMenu());
         binding.layoutMain.rcvMenu.setAdapter(gameMenuAdapter);
+        binding.drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        assert binding.layoutNavigation.speedSeekBar != null;
+        binding.layoutNavigation.speedSeekBar.setProgress((int) (gamePlayerSpeed * 10), true);
 
     }
 
@@ -55,7 +63,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
             }
         });
         binding.layoutMain.options.setOnClickListener(view -> {
-            binding.drawer.openDrawer(binding.navigationView, true);
+            binding.drawer.openDrawer(binding.navigationView, false);
         });
 
         binding.layoutNavigation.soundSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -68,6 +76,22 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                     closeSound();
                 }
                 GameSharePreference.getInstance().setBoolean(Const.SOUND_CHECK_KEY, b);
+            }
+        });
+        binding.layoutNavigation.speedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                gamePlayerSpeed = i / 10f;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                GameSharePreference.getInstance().setFloat(Const.PLAYER_SPEED, gamePlayerSpeed);
             }
         });
     }

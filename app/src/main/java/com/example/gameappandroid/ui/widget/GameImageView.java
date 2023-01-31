@@ -14,6 +14,7 @@ import com.example.gameappandroid.R;
 import com.example.gameappandroid.gamemodel.EntityManager;
 import com.example.gameappandroid.gamemodel.PlayerManager;
 import com.example.gameappandroid.gameutils.GameUtils;
+import com.haiprj.base.interfaces.EntityListener;
 
 public class GameImageView extends androidx.appcompat.widget.AppCompatImageView {
 
@@ -123,8 +124,5 @@ public class GameImageView extends androidx.appcompat.widget.AppCompatImageView 
         listener.onRemove();
     }
 
-    public interface EntityListener{
-        void onRemove();
-    }
 
 }

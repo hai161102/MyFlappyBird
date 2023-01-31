@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
@@ -17,6 +18,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.gameappandroid.Const;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.gamemodel.EntityManager;
 import com.example.gameappandroid.gamemodel.PlayerManager;
@@ -25,6 +27,8 @@ import com.example.gameappandroid.gameutils.GameUtils;
 import com.example.gameappandroid.interfaces.GameListener;
 import com.example.gameappandroid.interfaces.PlayerListener;
 import com.example.gameappandroid.ui.activity.MainActivity;
+import com.haiprj.base.interfaces.EntityListener;
+import com.haiprj.base.utils.GameSharePreference;
 import com.haiprj.base.widget.BaseGameFrame;
 
 import java.io.IOException;
@@ -41,7 +45,7 @@ public class GameFrame extends BaseGameFrame {
     private GamePlayerView ballImageView;
     private PlayerManager playerManager;
     private final DisplayMetrics displayMetrics = new DisplayMetrics();
-    private GameEntityView[] gameEntityViews;
+    private GameBigEntity[] gameEntityViews;
 
     private GameListener gameListener;
 
@@ -106,7 +110,7 @@ public class GameFrame extends BaseGameFrame {
 
     private void setLayout() {
 
-        entityWidth = (int) GameUtils.pxFromDp(getContext(), 32);
+        entityWidth = (int) GameUtils.pxFromDp(getContext(), 80);
         entityHeight = (int) GameUtils.pxFromDp(getContext(), 32);
 
         LayoutParams layoutParams = new LayoutParams(MainActivity.screenWidth, MainActivity.screenHeight);
@@ -114,7 +118,7 @@ public class GameFrame extends BaseGameFrame {
     }
 
     private void initBackground() {
-        gameEntityViews = new GameEntityView[200];
+        gameEntityViews = new GameBigEntity[100];
 
         for (int i = 0; i < gameEntityViews.length; i++) {
 
@@ -123,19 +127,22 @@ public class GameFrame extends BaseGameFrame {
         }
     }
 
-    private GameEntityView getNewEntity(int index){
+    private GameBigEntity getNewEntity(int index){
         float plusSpace = 0;
         if (plusSpace == 0){
             plusSpace += MainActivity.screenWidth;
         }
         if (index > 0){
-            plusSpace = gameEntityViews[index - 1].getX() + entityWidth * 2;
+            plusSpace = gameEntityViews[index - 1].getX() + entityWidth * 2.5f;
         }
-        EntityManager entityManager = new EntityManager("", R.drawable.wall, entityWidth, MainActivity.screenHeight, plusSpace, getHeightSpawnEntity());
+        EntityManager entityManager = new EntityManager("", R.drawable.wall, entityWidth, MainActivity.screenHeight, plusSpace, 0);
         entityManager.worldX = entityManager.getX();
         entityManager.worldY = entityManager.getY();
-        GameEntityView gameEntityView = new GameEntityView(getContext(), entityManager);
-        gameEntityView.setListener(new GameImageView.EntityListener() {
+        float point = getHeightSpawnEntity();
+        Log.d("POINT_RANDOM", "getNewEntity: " + point);
+        float space = entityHeight * 3;
+        GameBigEntity gameEntityView = new GameBigEntity(getContext(), entityManager, point, space - getMinusSpace(space));
+        gameEntityView.setEntityListener(new EntityListener() {
             @Override
             public void onRemove() {
                 gameEntityViews[0] = null;
@@ -143,7 +150,7 @@ public class GameFrame extends BaseGameFrame {
                 for (int j = 0; j < gameEntityViews.length - 1; j++){
                     gameEntityViews[j] = gameEntityViews[j+1];
                 }
-                gameEntityViews[199] = getNewEntity(199);
+                gameEntityViews[gameEntityViews.length - 1] = getNewEntity(gameEntityViews.length - 1);
             }
         });
         return gameEntityView;
@@ -156,8 +163,9 @@ public class GameFrame extends BaseGameFrame {
         playerManager.setY(MainActivity.screenHeight / 2f);
         playerManager.setWidth((int) GameUtils.getDp(getContext(), (int) (24 * percent)));
         playerManager.setHeight((int) GameUtils.getDp(getContext(), 24));
-        playerManager.setPlayerSpeed(4f);
-        playerManager.setName("Ball");
+        playerManager.setPlayerSpeed(GameSharePreference.getInstance().getFloat(Const.PLAYER_SPEED, 6f));
+        playerManager.setSpeedDown(8f);
+        playerManager.setName("My Bird");
         playerManager.setImageId(R.drawable.bird);
         playerManager.worldX = 0f;
         playerManager.worldY = MainActivity.screenHeight / 2;
@@ -175,7 +183,9 @@ public class GameFrame extends BaseGameFrame {
         this.ballImageView.update();
         for (int i = 0; i  < gameEntityViews.length; i++){
             gameEntityViews[i].update(playerManager);
-            if (RectF.intersects(playerManager.getRectF(), gameEntityViews[i].getChildRectF(0) ) || RectF.intersects(playerManager.getRectF(), gameEntityViews[i].getChildRectF(1) )){
+            if (RectF.intersects(playerManager.getRectF(), gameEntityViews[i].getChildRectF(0) )
+                    || RectF.intersects(playerManager.getRectF(), gameEntityViews[i].getChildRectF(1) )
+            ){
                 deathSound.start();
             }
         }
@@ -241,5 +251,11 @@ public class GameFrame extends BaseGameFrame {
     public void destroy(){
         super.destroy();
         this.playerManager.releaseSound();
+    }
+
+    public float getMinusSpace (float space){
+        float oOT = space / 10f;
+
+        return random.nextInt((int) (oOT * 2));
     }
 }

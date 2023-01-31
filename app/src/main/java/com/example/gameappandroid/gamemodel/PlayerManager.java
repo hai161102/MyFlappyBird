@@ -13,7 +13,7 @@ import com.haiprj.base.widget.BaseEntity;
 public class PlayerManager extends BaseEntity {
     public boolean isJump = false;
     private float playerSpeed;
-
+    private float speedDown;
     public boolean canDown = true, canUp = false, canLeft = false, canRight = true;
 
     private MediaPlayer mediaPlayer;
@@ -56,6 +56,14 @@ public class PlayerManager extends BaseEntity {
         this.playerSpeed = playerSpeed;
     }
 
+    public float getSpeedDown() {
+        return speedDown;
+    }
+
+    public void setSpeedDown(float speedDown) {
+        this.speedDown = speedDown;
+    }
+
     public void update(){
         if (canRight){
             this.worldX += this.playerSpeed;
@@ -66,11 +74,11 @@ public class PlayerManager extends BaseEntity {
 
         if (canDown && !canUp){
             //this.worldY += this.playerSpeed;
-            this.y += this.playerSpeed;
+            this.y += this.speedDown;
         }
         if (canUp){
             //this.worldY -= this.playerSpeed;
-            this.y -= this.playerSpeed;
+            this.y -= this.speedDown;
             playFlySound();
 
         }

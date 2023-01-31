@@ -16,15 +16,19 @@ import com.example.gameappandroid.R;
 import com.example.gameappandroid.gamemodel.EntityManager;
 import com.example.gameappandroid.gamemodel.PlayerManager;
 import com.example.gameappandroid.gameutils.GameUtils;
+import com.example.gameappandroid.ui.activity.MainActivity;
+import com.haiprj.base.interfaces.EntityListener;
 
 @SuppressLint("ViewConstructor")
 public class GameEntityView extends FrameLayout {
 
-    private GameImageView topEntity, bottomEntity;
+    private GameView topEntity, bottomEntity;
 
 
     private final EntityManager entityManager;
-    private GameImageView.EntityListener listener;
+    private EntityListener listener;
+
+    private float entitySpace;
 
     public GameEntityView(@NonNull Context context, EntityManager entityManager) {
         super(context);
@@ -50,25 +54,31 @@ public class GameEntityView extends FrameLayout {
         init();
     }
 
-    public void setListener(GameImageView.EntityListener listener) {
+    public void setListener(EntityListener listener) {
         this.listener = listener;
+    }
+
+    public void setEntitySpace(float entitySpace) {
+        this.entitySpace = entitySpace;
+        float topHeight = entityManager.getY() - entitySpace / 2f;
+        LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        EntityManager entityT = new EntityManager("1", R.drawable.wall_entity_top, params.width, params.height, 0, -(params.height - topHeight));
+        entityT.worldX = entityT.getX();
+        entityT.worldY = entityT.getY();
+        topEntity = new GameView(getContext(), entityT);
+        EntityManager entityB = new EntityManager("2", R.drawable.wall_entity, params.width, params.height, 0, entityManager.getY() + entitySpace / 2);
+        entityB.worldX = entityB.getX();
+        entityB.worldY = entityB.getY();
+        bottomEntity = new GameView(getContext(), entityB);
+        this.addView(topEntity, 0);
+        this.addView(bottomEntity, 1);
     }
 
     private void init(){
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(entityManager.getWidth(), entityManager.getHeight());
         this.setLayoutParams(params);
         this.setX(entityManager.getX());
-        this.setY(entityManager.getY() - entityManager.getHeight() / 2f);
-        EntityManager entityT = new EntityManager("", R.drawable.wall_entity_top, LayoutParams.MATCH_PARENT, GameUtils.getDp(getContext(), 128), 0, 0);
-        entityT.worldX = entityT.getX();
-        entityT.worldY = entityT.getY();
-        topEntity = new GameImageView(getContext(), entityT);
-        EntityManager entityB = new EntityManager("", R.drawable.wall_entity, LayoutParams.MATCH_PARENT, GameUtils.getDp(getContext(), 128), 0, entityManager.getHeight() - GameUtils.getDp(getContext(), 128));
-        entityB.worldX = entityB.getX();
-        entityB.worldY = entityB.getY();
-        bottomEntity = new GameImageView(getContext(), entityB);
-        this.addView(topEntity, 0);
-        this.addView(bottomEntity, 1);
+        this.setY(0);
         this.setBackgroundColor(Color.TRANSPARENT);
 
     }
@@ -84,7 +94,7 @@ public class GameEntityView extends FrameLayout {
         if (index > 1){
             return new RectF();
         }
-        RectF rectF = ((GameImageView) this.getChildAt(index)).getEntityManager().getRectF();
+        RectF rectF = ((GameView) this.getChildAt(index)).getEntity().getRectF();
         float w = rectF.width();
         float h = rectF.height();
         rectF.left += this.getX();

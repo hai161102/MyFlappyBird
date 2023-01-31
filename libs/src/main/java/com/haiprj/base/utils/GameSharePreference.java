@@ -101,4 +101,16 @@ public class GameSharePreference {
         editor.putBoolean(key, b);
         editor.apply();
     }
+
+    public void setFloat(String key, float value){
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putFloat(key, value);
+        editor.apply();
+    }
+
+    public void setInt(String key, int value) {
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putInt(key, value);
+        editor.apply();
+    }
 }
