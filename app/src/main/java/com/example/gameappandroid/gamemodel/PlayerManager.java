@@ -8,18 +8,18 @@ import androidx.annotation.RequiresApi;
 
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.interfaces.PlayerListener;
+import com.haiprj.base.enums.MediaEnum;
+import com.haiprj.base.models.MediaObject;
 import com.haiprj.base.widget.BaseEntity;
+import com.haiprj.base.widget.GameMedia;
 
 public class PlayerManager extends BaseEntity {
-    public boolean isJump = false;
+
+
+    private Context context;
     private float playerSpeed;
     private float speedDown;
     public boolean canDown = true, canUp = false, canLeft = false, canRight = true;
-
-    private MediaPlayer mediaPlayer;
-    private MediaPlayer deathSound;
-
-    private PlayerListener playerListener;
 
     public int score = 0;
 
@@ -34,20 +34,7 @@ public class PlayerManager extends BaseEntity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void setMediaPlayer(Context context) {
-        this.mediaPlayer = MediaPlayer.create(context, R.raw.fly_sound);
-        this.deathSound = MediaPlayer.create(context, R.raw.death_sound);
-        this.deathSound.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.pause();
-            }
-        });
-        this.deathSound.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
-            @Override
-            public void onSeekComplete(MediaPlayer mediaPlayer) {
-                playerListener.onSoundComplete();
-            }
-        });
+        this.context = context;
     }
 
     public float getPlayerSpeed() {
@@ -81,7 +68,9 @@ public class PlayerManager extends BaseEntity {
         if (canUp){
             //this.worldY -= this.playerSpeed;
             this.y -= this.speedDown;
-            playFlySound();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                playFlySound();
+            }
 
         }
 
@@ -91,26 +80,20 @@ public class PlayerManager extends BaseEntity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void playFlySound() {
-        if (mediaPlayer != null) mediaPlayer.start();
-    }
-
-    public void playDeathSound(PlayerListener playerListener){
-        this.playerListener = playerListener;
-        this.deathSound.start();
-
+        GameMedia.getInstance(context).playSong(MediaEnum.FLY_SONG);
     }
     public void resetSound(){
-        if (mediaPlayer != null) mediaPlayer.seekTo(0);
+        GameMedia.getInstance(context).getMediaPlayerAt(MediaEnum.FLY_SONG).seekTo(0);
     }
 
     public void stopSound(){
-        this.mediaPlayer.stop();
+        GameMedia.getInstance(context).stopSong(MediaEnum.FLY_SONG);
     }
 
     public void releaseSound(){
-        this.mediaPlayer.release();
-        this.deathSound.release();
+        GameMedia.getInstance(context).releaseSong(MediaEnum.FLY_SONG);
     }
 
 

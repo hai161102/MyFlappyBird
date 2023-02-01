@@ -1,5 +1,7 @@
 package com.example.gameappandroid.ui.activity;
 
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
@@ -7,13 +9,22 @@ import android.widget.SeekBar;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.gameappandroid.Const;
+import com.example.gameappandroid.gamemodel.GameMediaObject;
 import com.example.gameappandroid.ui.adapter.GameMenuAdapter;
+import com.haiprj.base.enums.MediaEnum;
+import com.haiprj.base.models.MediaObject;
 import com.haiprj.base.view.BaseActivity;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.databinding.ActivityMainBinding;
 import com.haiprj.base.view.BaseAdapter;
 import com.haiprj.base.utils.GameSharePreference;
+import com.haiprj.base.widget.GameMedia;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +46,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         else {
             closeSound();
         }
+
+        GameMedia.getInstance(this, getListMediaObjects());
+
         displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
@@ -113,5 +127,13 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
+    }
+
+    private List<MediaObject> getListMediaObjects() {
+        List<MediaObject> mediaObjects = new ArrayList<>();
+
+        mediaObjects.add(new GameMediaObject(MediaEnum.FLY_SONG, R.raw.fly_sound));
+        mediaObjects.add(new GameMediaObject(MediaEnum.DEATH_SONG, R.raw.death_sound));
+        return mediaObjects;
     }
 }

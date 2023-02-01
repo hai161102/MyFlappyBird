@@ -22,10 +22,12 @@ import com.example.gameappandroid.gamemodel.EntityManager;
 import com.example.gameappandroid.gamemodel.PlayerManager;
 import com.example.gameappandroid.interfaces.GameListener;
 import com.example.gameappandroid.ui.activity.MainActivity;
+import com.haiprj.base.enums.MediaEnum;
 import com.haiprj.base.interfaces.EntityListener;
 import com.haiprj.base.utils.GameSharePreference;
 import com.haiprj.base.utils.GameUtils;
 import com.haiprj.base.widget.BaseGameFrame;
+import com.haiprj.base.widget.GameMedia;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import java.util.Random;
@@ -50,7 +52,6 @@ public class GameFrame extends BaseGameFrame {
     private Random random;
     float countLenght = 0;
 
-    private MediaPlayer deathSound;
 
     private GameTextView textView;
 
@@ -76,7 +77,7 @@ public class GameFrame extends BaseGameFrame {
 
     private int numberProgressCount = 0;
 
-
+    private boolean isResume = false;
     public void setGameListener(GameListener gameListener) {
         this.gameListener = gameListener;
     }
@@ -85,21 +86,6 @@ public class GameFrame extends BaseGameFrame {
     @Override
     protected void init(){
         super.init();
-
-        deathSound = MediaPlayer.create(getContext(), R.raw.death_sound);
-
-        deathSound.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.seekTo(0);
-            }
-        });
-        deathSound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                gameOver();
-            }
-        });
         random = new Random();
         setLayout();
         initPlayer();
@@ -181,6 +167,7 @@ public class GameFrame extends BaseGameFrame {
     private GameBigEntity entityOnDeath;
     @Override
     protected void update() {
+
         super.update();
         this.playerManager.update();
         this.ballImageView.update();
@@ -194,10 +181,12 @@ public class GameFrame extends BaseGameFrame {
                     || RectF.intersects(playerManager.getRectF(), gameEntityViews[i].getChildRectF(1) )
             ){
                 entityOnDeath = gameEntityViews[i];
-                gameOver();
+                isGameOver = true;
+                GameMedia.getInstance(getContext()).playSong(MediaEnum.DEATH_SONG);
             }
         }
         if (playerManager.getY() >= MainActivity.screenHeight || playerManager.getY() <= 0){
+            isGameOver = true;
             gameOver();
         }
 
@@ -211,14 +200,9 @@ public class GameFrame extends BaseGameFrame {
     }
 
     public void resumePlay(){
-
+        isResume = true;
         setupPlayerResume();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                isGameOver = false;
-            }
-        }, 3000);
+
     }
 
     private void setupPlayerResume() {
@@ -254,13 +238,11 @@ public class GameFrame extends BaseGameFrame {
         return numberRand + fixRect.top;
     }
 
-    private void gameOver() {
-        isGameOver = true;
+    public void gameOver() {
         if (playerManager.score > GameSharePreference.getInstance().getInt(Const.HIGHEST_SCORE_KEY, 0)){
             GameSharePreference.getInstance().setInt(Const.HIGHEST_SCORE_KEY, playerManager.score);
         }
         gameListener.onOver(playerManager);
-        playerManager.stopSound();
     }
 
     private void gameWin() {
@@ -272,6 +254,10 @@ public class GameFrame extends BaseGameFrame {
         super.onTouchDown(view);
         playerManager.canUp = true;
         playerManager.canDown = false;
+        if (isResume){
+            isGameOver = false;
+            isResume = false;
+        }
     }
 
     @Override

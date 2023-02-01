@@ -7,11 +7,13 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.gameappandroid.ui.dialog.DeathDialog;
+import com.haiprj.base.enums.MediaEnum;
 import com.haiprj.base.view.BaseActivity;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.databinding.ActivityGameBinding;
 import com.example.gameappandroid.gamemodel.PlayerManager;
 import com.example.gameappandroid.interfaces.GameListener;
+import com.haiprj.base.widget.GameMedia;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import java.util.Objects;
@@ -51,10 +53,16 @@ public class GameActivity extends BaseActivity<ActivityGameBinding> {
                     }
                     if (Objects.equals(key, "replay")){
 
+                        binding.gameFrame.playAgain();
+                    }
+                    if (Objects.equals(key, "resume")){
                         binding.gameFrame.resumePlay();
                     }
                 }, playerManager).showDialog();
             }
+        });
+        GameMedia.getInstance(this).getMediaPlayerAt(MediaEnum.DEATH_SONG).setOnCompletionListener(mediaPlayer -> {
+            binding.gameFrame.gameOver();
         });
     }
 

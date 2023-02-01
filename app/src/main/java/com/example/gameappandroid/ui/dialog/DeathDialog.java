@@ -73,6 +73,10 @@ public class DeathDialog extends BaseDialog<DialogFinishBinding> {
             onActionDialogCallback.callback("replay");
             dismiss();
         });
+        binding.resume.setOnClickListener(view -> {
+            onActionDialogCallback.callback("resume");
+            dismiss();
+        });
     }
 
     @SuppressLint("DefaultLocale")
@@ -96,10 +100,12 @@ public class DeathDialog extends BaseDialog<DialogFinishBinding> {
     @Override
     protected void onDismiss() {
         super.onDismiss();
+        instance = null;
     }
 
     @Override
     protected void onCancel() {
         super.onCancel();
+        instance = null;
     }
 }
