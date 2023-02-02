@@ -2,10 +2,8 @@ package com.haiprj.base.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -13,8 +11,6 @@ import androidx.annotation.RequiresApi;
 import com.haiprj.base.enums.MediaEnum;
 import com.haiprj.base.models.MediaObject;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,6 +18,7 @@ import java.util.List;
 
 public class GameMedia {
 
+    private boolean isMute;
     private final Context context;
     public final List<MediaPlayer> mediaPlayers = new ArrayList<>();
     @SuppressLint("StaticFieldLeak")
@@ -47,6 +44,10 @@ public class GameMedia {
         if (instance == null)
             instance = new GameMedia(context, list);
         return instance;
+    }
+
+    public void setMute(boolean mute) {
+        isMute = mute;
     }
 
     public void addSource(MediaObject mediaObject) {
@@ -81,6 +82,7 @@ public class GameMedia {
     }
 
     public void playSong(MediaEnum songID) {
+        if (isMute) return;
         MediaObject mediaObject = getMediaByEnum(songID);
         int index = this.listSource.indexOf(mediaObject);
         if (mediaPlayers.get(index) == null) {
@@ -91,11 +93,13 @@ public class GameMedia {
     }
 
     public void resetSong(MediaEnum songID) {
+        if (isMute) return;
         int index = this.listSource.indexOf(getMediaByEnum(songID));
         this.mediaPlayers.get(index).reset();
     }
 
     public void resetSong(MediaEnum songID, boolean toZero) {
+        if (isMute) return;
         int index = this.listSource.indexOf(getMediaByEnum(songID));
         if (toZero)
             this.mediaPlayers.get(index).seekTo(0);
@@ -104,6 +108,7 @@ public class GameMedia {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void resetSong(MediaEnum songID, boolean toZero, int mode) {
+        if (isMute) return;
         int index = this.listSource.indexOf(getMediaByEnum(songID));
         if (toZero)
             this.mediaPlayers.get(index).seekTo(0, mode);
@@ -111,11 +116,13 @@ public class GameMedia {
     }
 
     public void releaseSong (MediaEnum id) {
+        if (isMute) return;
         int index = this.listSource.indexOf(getMediaByEnum(id));
         this.mediaPlayers.get(index).release();
     }
 
     public void stopSong (MediaEnum id) {
+        if (isMute) return;
         getMediaPlayerAt(id).stop();
     }
 

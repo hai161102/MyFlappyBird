@@ -111,9 +111,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void closeSound() {
+        GameMedia.getInstance(this).setMute(true);
     }
 
     private void openSound() {
+        GameMedia.getInstance(this).setMute(false);
     }
 
     private List<String> getListMenu(){
