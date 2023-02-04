@@ -6,8 +6,8 @@ import com.example.gameappandroid.mvp.view.ViewResult;
 
 public class DataPresenter implements DataResult {
 
-    private ViewResult viewResult;
-    private DataModel dataModel;
+    protected ViewResult viewResult;
+    protected DataModel dataModel;
     public DataPresenter(ViewResult viewResult) {
         this.viewResult = viewResult;
         dataModel = new DataModel(this);
