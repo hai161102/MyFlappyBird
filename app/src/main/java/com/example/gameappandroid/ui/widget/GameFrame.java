@@ -123,12 +123,12 @@ public class GameFrame extends BaseGameFrame {
         if (index > 0){
             plusSpace = gameEntityViews[index - 1].getX() + entityWidth * 2.5f;
         }
-        EntityManager entityManager = new EntityManager("", R.drawable.wall, entityWidth, MainActivity.screenHeight, plusSpace, 0);
+        EntityManager entityManager = new EntityManager(getContext(), "", new int[] {R.drawable.wall}, entityWidth, MainActivity.screenHeight, plusSpace, 0);
         entityManager.worldX = entityManager.getX();
         entityManager.worldY = entityManager.getY();
         float point = getHeightSpawnEntity();
         Log.d("POINT_RANDOM", "getNewEntity: " + point);
-        float space = entityHeight * 3;
+        float space = entityHeight * 6;
         GameBigEntity gameEntityView = new GameBigEntity(getContext(), entityManager, point, space - getMinusSpace(space));
         gameEntityView.setEntityListener(new EntityListener() {
             @Override
@@ -146,7 +146,7 @@ public class GameFrame extends BaseGameFrame {
 
     private void initPlayer() {
         float percent = 817 / 577;
-        playerManager = new PlayerManager();
+        playerManager = new PlayerManager(getContext());
         playerManager.setX(MainActivity.screenWidth / 2f);
         playerManager.setY(MainActivity.screenHeight / 2f);
         playerManager.setWidth((int) GameUtils.getDp(getContext(), (int) (180 * percent)));
@@ -154,7 +154,9 @@ public class GameFrame extends BaseGameFrame {
         playerManager.setPlayerSpeed(GameSharePreference.getInstance().getFloat(Const.PLAYER_SPEED, 6f));
         playerManager.setSpeedDown(8f);
         playerManager.setName("My Bird");
-        playerManager.setImageId(R.drawable.bird);
+        playerManager.setImageId(new int[] {
+                R.drawable.bird
+        });
         playerManager.worldX = 0f;
         playerManager.worldY = MainActivity.screenHeight / 2;
         playerManager.setMediaPlayer(getContext());
@@ -182,7 +184,8 @@ public class GameFrame extends BaseGameFrame {
             ){
                 entityOnDeath = gameEntityViews[i];
                 isGameOver = true;
-                GameMedia.getInstance(getContext()).playSong(MediaEnum.DEATH_SONG);
+                gameOver();
+                //GameMedia.getInstance(getContext()).playSong(MediaEnum.DEATH_SONG);
             }
         }
         if (playerManager.getY() >= MainActivity.screenHeight || playerManager.getY() <= 0){
@@ -280,7 +283,7 @@ public class GameFrame extends BaseGameFrame {
     @Override
     public void destroy(){
         super.destroy();
-        this.playerManager.releaseSound();
+        //this.playerManager.releaseSound();
     }
 
     public float getMinusSpace (float space){
@@ -293,7 +296,7 @@ public class GameFrame extends BaseGameFrame {
         textView = new GameTextView(getContext());
         textView.setText(String.format(getContext().getString(R.string.dialog_score), playerManager.score));
         textView.setBackgroundResource(R.drawable.shape_button);
-        textView.setTextColor(R.color.app_38);
+        textView.setTextColor(R.color.text_color);
         textView.setTextSize(GameUtils.getDp(getContext(), 24));
         textView.setX(0);
         textView.setY(0);

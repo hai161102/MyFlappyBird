@@ -7,10 +7,10 @@ public class GameMatrix {
 
     public final int col;
     public final int row;
-
     public GameMatrix(int col, int row) {
         this.col = col;
         this.row = row;
+
         Log.d("Matrix size", "GameMatrix: matrix size col = " + this.col + ", row = " + this.row);
     }
 

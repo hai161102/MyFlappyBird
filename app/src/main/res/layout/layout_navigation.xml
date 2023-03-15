@@ -55,5 +55,45 @@
 
             </LinearLayout>
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@drawable/shape_button_setting"
+            android:layout_marginTop="12dp"
+            android:id="@+id/gameSetting">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/playerSpeed">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/speedImg"
+                    android:src="@drawable/sound"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/speed"
+                    android:paddingHorizontal="12dp"
+                    android:textStyle="normal"
+                    android:textSize="20sp"
+                    android:textColor="@color/app_38"
+                    android:layout_marginHorizontal="12dp"/>
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:max="100"
+                    android:id="@+id/speedSeekBar"
+                    android:progressTint="@color/game_color"
+                    android:thumb="@drawable/bird_icon"/>
+
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </layout>

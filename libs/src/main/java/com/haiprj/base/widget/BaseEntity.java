@@ -5,7 +5,7 @@ import android.graphics.RectF;
 
 public abstract class BaseEntity {
     protected String name;
-    protected int imageId;
+    protected int[] imageId;
     protected int width;
     protected int height;
     protected float x;
@@ -14,7 +14,7 @@ public abstract class BaseEntity {
     public float worldX = 0f;
     public float worldY = 0f;
 
-    public BaseEntity(String name, int imageId, int width, int height, float x, float y) {
+    public BaseEntity(String name, int[] imageId, int width, int height, float x, float y) {
         this.name = name;
         this.imageId = imageId;
         this.width = width;
@@ -34,11 +34,11 @@ public abstract class BaseEntity {
         this.name = name;
     }
 
-    public int getImageId() {
+    public int[] getImageId() {
         return imageId;
     }
 
-    public void setImageId(int imageId) {
+    public void setImageId(int[] imageId) {
         this.imageId = imageId;
     }
 

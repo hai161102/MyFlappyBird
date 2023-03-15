@@ -53,8 +53,9 @@ public class GamePlayerView extends androidx.appcompat.widget.AppCompatImageView
     private void init() {
         if (playerManager == null){
             playerManager = new PlayerManager(
+                    getContext(),
                     "Unknown",
-                    R.drawable.ic_launcher_background,
+                    new int[] {R.drawable.ic_launcher_background},
                     (int) GameUtils.pxFromDp(getContext(), 20),
                     (int) GameUtils.pxFromDp(getContext(), 20),
                     0,
@@ -65,7 +66,7 @@ public class GamePlayerView extends androidx.appcompat.widget.AppCompatImageView
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(playerManager.getWidth(), playerManager.getHeight());
         this.setX(playerManager.getX());
         this.setY(playerManager.getY());
-        this.setImageResource(playerManager.getImageId());
+        this.setImageResource(playerManager.getImageId()[0]);
         this.setLayoutParams(layoutParams);
         this.setPadding(0, 0, 0, 0);
     }

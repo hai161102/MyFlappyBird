@@ -48,7 +48,7 @@ public abstract class BaseView extends View {
         this.setLayoutParams(layoutParams);
         this.setX(entity.getX());
         this.setY(entity.getY());
-        this.setBackgroundResource(entity.imageId);
+        this.setBackgroundResource(entity.imageId[0]);
     }
 
     public void setEntityListener(EntityListener entityListener) {

@@ -83,7 +83,7 @@ public class DeathDialog extends BaseDialog<DialogFinishBinding> {
     @Override
     protected void initView() {
         binding.playerName.setText(MessageFormat.format("{0}: {1}", getContext().getText(R.string.player), playerManager.getName()));
-        binding.imageDialog.setImageResource(playerManager.getImageId());
+        binding.imageDialog.setImageResource(playerManager.getImageId()[0]);
         binding.title.setText(R.string.game_over);
         binding.score.setText(String.format(getContext().getString(R.string.dialog_score), playerManager.score));
         assert binding.highestScore != null;

@@ -76,11 +76,11 @@ public class GameBigEntity extends BaseEntityView {
         switch (gravity) {
             case TOP:
                 y = - baseEntity.getHeight() + pointEmpty - space / 2f;
-                return new EntityManager("top", R.drawable.cot,baseEntity.getWidth(), baseEntity.getHeight(), x, y);
+                return new EntityManager(getContext(), "top",new int[] {R.drawable.cot},baseEntity.getWidth(), baseEntity.getHeight(), x, y);
             case BOTTOM:
                 y = pointEmpty + space / 2f;
 
-                return new EntityManager("bottom", R.drawable.cot,baseEntity.getWidth(), baseEntity.getHeight(), x, y);
+                return new EntityManager(getContext(), "top",new int[] {R.drawable.cot},baseEntity.getWidth(), baseEntity.getHeight(), x, y);
             default:
                 return null;
         }

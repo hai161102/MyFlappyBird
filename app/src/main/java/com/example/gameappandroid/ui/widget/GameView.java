@@ -32,8 +32,9 @@ public class GameView extends BaseView {
     protected void init() {
         if (entity == null){
             entity = new EntityManager(
+                    getContext(),
                     "",
-                    R.drawable.ic_launcher_background,
+                    new int[] {R.drawable.ic_launcher_background},
                     (int) GameUtils.pxFromDp(getContext(), 24),
                     (int) GameUtils.pxFromDp(getContext(), 24),
                     0f,
