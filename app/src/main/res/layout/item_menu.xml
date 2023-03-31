@@ -19,7 +19,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_color"
                 android:layout_gravity="center"
-                android:fontFamily="monospace"
+                android:fontFamily="@font/poppins_semibold"
                 android:textSize="16dp"
                 android:text="@string/app_name"/>
         </LinearLayout>

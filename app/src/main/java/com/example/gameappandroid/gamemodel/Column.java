@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
-import com.haiprj.base.interfaces.EntityListener;
 import com.haiprj.base.utils.GameUtils;
 
 import java.util.ArrayList;
@@ -15,56 +14,67 @@ public class Column {
 
     private final Context context;
     private final Random random;
-    private final DoubleEntity[] doubleEntities;
+    private final MyEntity[] myEntities;
     private final PlayerManager playerManager;
 
     private final int entityWidth;
     private final int viewWidth;
     private final int viewHeight;
     private final float spaceScale = 3f;
+    private final boolean isPortrait;
 
-    public Column(Context context, PlayerManager playerManager, int viewWidth, int viewHeight) {
+    public Column(Context context, PlayerManager playerManager, int viewWidth, int viewHeight, boolean isPortrait) {
         this.context = context;
         this.playerManager = playerManager;
         this.viewWidth = viewWidth;
         this.viewHeight = viewHeight;
+        this.isPortrait = isPortrait;
         random = new Random();
-        doubleEntities = new DoubleEntity[10];
-        entityWidth = ((int) GameUtils.pxFromDp(this.context, 56));
+        myEntities = new MyEntity[10];
+        entityWidth = (int) ((viewHeight * 32 / 268) / 1.5f);
         init();
     }
 
     private void init() {
-        for (int i = 0; i < doubleEntities.length; i++) {
-            doubleEntities[i] = getNew(i);
+        for (int i = 0; i < myEntities.length; i++) {
+            myEntities[i] = getNew(i);
         }
     }
 
     public void draw(Canvas canvas) {
-        for (DoubleEntity doubleEntity : doubleEntities) {
-            doubleEntity.run(playerManager);
-            if (doubleEntity.getTopE().worldX >= - doubleEntity.getTopE().getWidth() * spaceScale && doubleEntity.getTopE().worldX <= viewWidth + doubleEntity.getTopE().getWidth() * 3f)
-                doubleEntity.draw(canvas);
+        for (MyEntity myEntity : myEntities) {
+            RectF rectF = myEntity.getEntityRectF();
+            if (rectF.left >= - (rectF.width() + 20)
+            && rectF.right <= (rectF.width() + viewWidth)) {
+                myEntity.draw(canvas);
+            }
+
         }
     }
 
-    private DoubleEntity getNew(int i) {
+    private MyEntity getNew(int i) {
         float plusSpace = 0;
         plusSpace += viewWidth;
         if (i > 0){
-            plusSpace = doubleEntities[i - 1].getTopE().getX() + entityWidth * spaceScale;
+            if (isPortrait){
+                plusSpace = myEntities[i - 1].getWorldX() + viewWidth;
+            }else
+                plusSpace = myEntities[i - 1].getWorldX() + viewWidth / 4f;
         }
-        float space = viewHeight / 2.5f;
-        return new DoubleEntity(
+        float space = isPortrait ? viewHeight / 3.5f : viewHeight / 2.5f;
+        return new MyEntity(
                 context,
+                entityWidth,
+                entityWidth * 268 / 32,
                 space - getMinusSpace(space),
                 getHeightSpawnEntity(),
                 plusSpace,
-                entityWidth,
+                this.viewWidth,
                 this.viewHeight,
-                () -> {
-                    System.arraycopy(doubleEntities, 1, doubleEntities, 0, doubleEntities.length - 1);
-                    doubleEntities[doubleEntities.length - 1] = getNew(doubleEntities.length - 1);
+                playerManager,
+                ()-> {
+                    System.arraycopy(myEntities, 1, myEntities, 0, myEntities.length - 1);
+                    myEntities[myEntities.length - 1] = getNew(myEntities.length - 1);
                 }
         );
     }
@@ -83,16 +93,50 @@ public class Column {
     @SuppressWarnings("IntegerDivisionInFloatingPointContext")
     private float getHeightSpawnEntity(){
 
+        float space = isPortrait ? viewHeight / 4 : viewHeight / 3;
         final RectF fixRect = new RectF();
         fixRect.left = 0f;
         fixRect.right = viewWidth;
-        fixRect.top = viewHeight / 3;
-        fixRect.bottom = viewHeight - fixRect.top;
+        fixRect.top = viewHeight / 2 - space / 2;
+        fixRect.bottom = fixRect.top + space;
 
         float range = fixRect.bottom - fixRect.top;
         float numberRand = random.nextInt((int) range);
 
 
         return numberRand + fixRect.top;
+    }
+
+    private MyEntity dieAt;
+    public boolean hasIntersection() {
+
+        for (MyEntity myEntity : myEntities) {
+            if (myEntity.hasIntersectionEntity()) {
+                dieAt = myEntity;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public MyEntity getDieAt() {
+        if (dieAt != null) return dieAt;
+        return null;
+    }
+
+    public void update() {
+        for (MyEntity myEntity : myEntities) {
+            if (myEntity.hasIntersectionX()) {
+                playerManager.score++;
+                break;
+            }
+        }
+        for (MyEntity myEntity : myEntities) {
+            myEntity.update();
+        }
+    }
+
+    public void onGameOver() {
+
     }
 }

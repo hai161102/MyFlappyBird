@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:ignore="MissingDefaultResource">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -32,7 +33,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:id="@+id/soundImg"
-                    android:src="@drawable/sound"
+                    android:src="@drawable/icon_sound"
                     />
                 <TextView
                     android:layout_width="0dp"
@@ -49,7 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/soundSwitch"
-                    android:thumb="@drawable/bird_icon"
+                    android:thumb="@drawable/app_icon"
                     android:trackTint="@color/game_color"
                     tools:ignore="UseSwitchCompatOrMaterialXml" />
 
@@ -72,7 +73,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:id="@+id/speedImg"
-                    android:src="@drawable/sound"
+                    android:src="@drawable/icon_speed"
                     />
                 <TextView
                     android:layout_width="wrap_content"
@@ -91,9 +92,67 @@
                     android:max="100"
                     android:id="@+id/speedSeekBar"
                     android:progressTint="@color/game_color"
-                    android:thumb="@drawable/bird_icon"/>
+                    android:thumb="@drawable/app_icon"/>
 
             </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@drawable/shape_button_setting"
+            android:layout_marginTop="12dp"
+            android:id="@+id/levelSettings">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/level">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:id="@+id/levelImg"
+                    android:src="@drawable/icon_level"
+                    />
+                <TextView
+                    android:id="@+id/levelText"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/normal"
+                    android:paddingHorizontal="12dp"
+                    android:textStyle="normal"
+                    android:textSize="20sp"
+                    android:textColor="@color/app_38"
+                    android:layout_marginHorizontal="12dp"/>
+                <com.example.gameappandroid.ui.widget.LevelSeekbar
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:id="@+id/levelSeekbar"
+                    android:progressTint="@color/game_color"
+                    android:thumb="@drawable/app_icon"/>
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:visibility="gone"
+            android:background="@drawable/shape_button_setting"
+            android:layout_marginTop="12dp"
+            android:id="@+id/playerColorPicker">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvColorPicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="4"
+                tools:listitem="@layout/layout_color"/>
         </LinearLayout>
     </LinearLayout>
 </layout>

@@ -13,9 +13,9 @@ import com.example.gameappandroid.Const;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.databinding.DialogFinishBinding;
 import com.example.gameappandroid.gamemodel.PlayerManager;
+import com.haiprj.android_app_lib.ui.BaseDialog;
 import com.haiprj.base.utils.GameSharePreference;
 import com.haiprj.base.utils.GameUtils;
-import com.haiprj.base.view.BaseDialog;
 
 import java.text.MessageFormat;
 
@@ -82,6 +82,7 @@ public class DeathDialog extends BaseDialog<DialogFinishBinding> {
     @SuppressLint("DefaultLocale")
     @Override
     protected void initView() {
+        getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         binding.playerName.setText(MessageFormat.format("{0}: {1}", getContext().getText(R.string.player), playerManager.getName()));
         binding.imageDialog.setImageResource(playerManager.getImageId()[0]);
         binding.title.setText(R.string.game_over);
@@ -89,7 +90,6 @@ public class DeathDialog extends BaseDialog<DialogFinishBinding> {
         assert binding.highestScore != null;
         binding.highestScore.setText(String.format(getContext().getString(R.string.dialog_highest_score), GameSharePreference.getInstance().getInt(Const.HIGHEST_SCORE_KEY, 0)));
         setCanceledOnTouchOutside(false);
-        getWindow().setLayout(GameUtils.getDp(getContext(), 4000), WindowManager.LayoutParams.WRAP_CONTENT);
     }
 
     @Override

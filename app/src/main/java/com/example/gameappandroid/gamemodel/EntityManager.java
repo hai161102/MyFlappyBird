@@ -3,6 +3,7 @@ package com.example.gameappandroid.gamemodel;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.RectF;
 
 import com.haiprj.base.widget.BaseEntity;
 
@@ -28,4 +29,5 @@ public class EntityManager extends BaseEntity {
     public Bitmap getBitmap() {
         return bitmaps[0];
     }
+
 }

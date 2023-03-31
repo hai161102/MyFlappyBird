@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
 
+import com.google.gson.Gson;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -68,5 +70,15 @@ public class GameUtils {
         }
 
         return imgIn;
+    }
+
+    public static String convertToJson(Object data) {
+        Gson gson = new Gson();
+        return gson.toJson(data);
+    }
+
+    public static <T> T getFromJson(String jsonString, Class<T> anoClass) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonString, anoClass);
     }
 }

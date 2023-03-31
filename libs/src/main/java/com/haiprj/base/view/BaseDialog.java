@@ -84,7 +84,7 @@ public abstract class BaseDialog<T> extends AppCompatDialog {
     public void showDialog(){
         try {
             show();
-        } catch (Exception e){
+        } catch (Exception ignored){
 
         }
     }

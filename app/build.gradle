@@ -1,5 +1,7 @@
 plugins {
-        id 'com.android.application'
+    id 'com.android.application'
+    id 'com.google.gms.google-services'
+
 }
 
 android {
@@ -12,12 +14,63 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        def formattedDate = new Date().format('hh.mm.MM.dd.yyyy')
+        archivesBaseName = "Base_V${versionName}_${formattedDate}"
     }
+
+    flavorDimensions "dimen"
+    productFlavors {
+        vDevelop_ {
+            applicationId "com.example.develop.test"
+            buildConfigField "boolean", "TEST_AD", "false"
+            buildConfigField "boolean", "PURCHASED", "false"
+            dimension "dimen"
+            versionName "develop"
+
+
+            def addConstantTo = { target, constantName, constantValue ->
+                target.manifestPlaceholders += [(constantName): constantValue]
+                target.buildConfigField "String", "${constantName}", "\"${constantValue}\""
+            }
+            addConstantTo(owner, "APP_ID", "ca-app-pub-3940256099942544~3347511713")
+
+            addConstantTo(owner, "inter_splash", "ca-app-pub-3940256099942544/1033173712")
+            addConstantTo(owner, "inter_exit", "ca-app-pub-3940256099942544/1033173712")
+            addConstantTo(owner, "banner_main", "ca-app-pub-3940256099942544/6300978111")
+            addConstantTo(owner, "banner_game", "ca-app-pub-3940256099942544/6300978111")
+
+        }
+
+        vOfficial_ {
+            applicationId "com.masterlibs.basestructor"
+
+            buildConfigField "boolean", "TEST_AD", "false"
+            buildConfigField "boolean", "PURCHASED", "false"
+            dimension "dimen"
+
+            def addConstantTo = { target, constantName, constantValue ->
+                target.manifestPlaceholders += [(constantName): constantValue]
+                target.buildConfigField "String", "${constantName}", "\"${constantValue}\""
+            }
+            addConstantTo(owner, "APP_ID", "ca-app-pub-3940256099942544~3347511713")
+
+            addConstantTo(owner, "inter_splash", "ca-app-pub-3940256099942544/1033173712")
+            addConstantTo(owner, "inter_exit", "ca-app-pub-3940256099942544/1033173712")
+            addConstantTo(owner, "banner_main", "ca-app-pub-3940256099942544/6300978111")
+            addConstantTo(owner, "banner_game", "ca-app-pub-3940256099942544/6300978111")
+        }
+    }
+
 
     buildTypes {
         release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -36,9 +89,12 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
+    implementation 'com.google.android.gms:play-services-ads-lite:21.5.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation project(":libs")
     implementation 'com.pnikosis:materialish-progress:1.7'
+    implementation 'com.github.hai161102:AndroidAppLib:1.0.6'
+
 }

@@ -1,5 +1,6 @@
 package com.haiprj.base.widget;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -12,6 +13,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
@@ -21,7 +23,7 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
     protected SurfaceHolder surfaceHolder;
     protected boolean isGameOver = false;
 
-    private GameThread gameThread;
+    protected GameThread gameThread;
 
     private final Runnable runnable = new Runnable() {
         @Override
@@ -35,11 +37,10 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
                 {
                     if (!isGameOver) {
                         update();
-
                     }
                     invalidate();
-                    postDelayed(this, 1000 / FPS);
                 }
+                postDelayed(this, 1000 / FPS);
 
             } finally
             {
@@ -48,6 +49,7 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
                     getHolder().unlockCanvasAndPost(canvas);
                 }
             }
+
         }
     };
 
@@ -75,6 +77,7 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
         this.surfaceHolder = getHolder();
         this.surfaceHolder.addCallback(this);
         this.setBackgroundColor(Color.TRANSPARENT);
+        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         this.setOnTouchListener(this);
     }
 
@@ -120,13 +123,18 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
         this.surfaceHolder = holder;
-//        if (gameThread == null)
-//        {
-//            gameThread = new GameThread(holder, this);
-//            gameThread.setRunning(true);
-//            gameThread.start();
-//        }
-        post(runnable);
+
+    }
+
+    public void startThread() {
+//        post(runnable);
+        if (gameThread == null)
+        {
+            gameThread = new GameThread(getHolder(), this);
+
+        }
+        gameThread.setRunning(true);
+        gameThread.start();
     }
 
     /**
@@ -141,21 +149,25 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
         this.surfaceHolder = holder;
-//        boolean retry = true;
-//        gameThread.setRunning(false);
-//        while (retry)
-//        {
-//            try
-//            {
-//                gameThread.join();
-//                retry = false;
-//            }
-//            catch (InterruptedException e)
-//            {
-//                Log.d(getClass().getSimpleName(), "Interrupted Exception", e);
-//            }
-//        }
-        removeCallbacks(runnable);
+        stopThread();
+    }
+
+    public void stopThread() {
+        boolean retry = true;
+        gameThread.setRunning(false);
+        while (retry)
+        {
+            try
+            {
+                gameThread.join();
+                retry = false;
+            }
+            catch (InterruptedException e)
+            {
+                Log.d(getClass().getSimpleName(), "Interrupted Exception", e);
+            }
+        }
+//        removeCallbacks(runnable);
     }
 
     /**
@@ -207,6 +219,7 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
             this.baseGameSurface = baseGameSurface;
         }
 
+        @SuppressLint("NewApi")
         @SuppressWarnings("BusyWait")
         @Override
         public void run()
@@ -219,14 +232,24 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
                 double remainTime = nextTime - System.nanoTime();
                 remainTime /= 1000000;
                 if (!isGameOver) {
-                    baseGameSurface.update(); //update the time between last update() call and now
+                    baseGameSurface.updateAll(); //update the time between last update() call and now
                 }
                 try
                 {
-                    canvas = holder.lockCanvas(null);
+                    canvas = holder.lockHardwareCanvas();
                     synchronized (holder)
                     {
                         postInvalidate();
+                    }
+                    try {
+                        if (remainTime < 0) {
+                            remainTime = 0;
+                        }
+
+                        Thread.sleep((long) remainTime);
+                        nextTime += drawInterval;
+                    } catch (InterruptedException ignored) {
+                        this.interrupt();
                     }
 
                 } finally
@@ -237,16 +260,7 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
                     }
                 }
 
-                try {
-                    if (remainTime < 0) {
-                        remainTime = 0;
-                    }
 
-                    Thread.sleep((long) remainTime);
-                    nextTime += drawInterval;
-                } catch (InterruptedException ignored) {
-                    this.interrupt();
-                }
             }
 
         }
@@ -255,6 +269,15 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
         {
             running = b;
         }
+    }
+
+    protected void updateAll() {
+        ((Activity) getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                update();
+            }
+        });
     }
 
 }

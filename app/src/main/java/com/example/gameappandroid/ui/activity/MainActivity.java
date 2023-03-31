@@ -1,5 +1,7 @@
 package com.example.gameappandroid.ui.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.DisplayMetrics;
@@ -8,11 +10,17 @@ import android.widget.SeekBar;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.example.gameappandroid.BuildConfig;
 import com.example.gameappandroid.Const;
+import com.example.gameappandroid.gamemodel.ColorModel;
 import com.example.gameappandroid.gamemodel.GameMediaObject;
+import com.example.gameappandroid.ui.adapter.ColorPickerAdapter;
 import com.example.gameappandroid.ui.adapter.GameMenuAdapter;
+import com.example.gameappandroid.ui.widget.LevelSeekbar;
+import com.haiprj.android_app_lib.my_admobs.AdmobManager;
 import com.haiprj.base.enums.MediaEnum;
 import com.haiprj.base.models.MediaObject;
+import com.haiprj.base.utils.GameUtils;
 import com.haiprj.base.view.BaseActivity;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.databinding.ActivityMainBinding;
@@ -26,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
@@ -33,13 +42,21 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private DisplayMetrics displayMetrics;
     private GameMenuAdapter gameMenuAdapter;
 
+    private ColorPickerAdapter colorPickerAdapter;
+
     private float gamePlayerSpeed = 6f;
     public static int screenWidth;
     public static int screenHeight;
+
+    public static void start(Context context) {
+        Intent starter = new Intent(context, MainActivity.class);
+        context.startActivity(starter);
+    }
     @Override
     protected void initView() {
         GameSharePreference.getInstance().init(this);
         gamePlayerSpeed = GameSharePreference.getInstance().getFloat(Const.PLAYER_SPEED, 6f);
+        AdmobManager.getInstance().loadBanner(this, BuildConfig.banner_main);
         if (GameSharePreference.getInstance().getBoolean(Const.SOUND_CHECK_KEY, false)){
             openSound();
         }
@@ -58,9 +75,46 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         binding.drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         assert binding.layoutNavigation.speedSeekBar != null;
         binding.layoutNavigation.speedSeekBar.setProgress((int) (gamePlayerSpeed * 10), true);
+        LevelSeekbar.Level defaultLevel = LevelSeekbar.Level.NORMAL;
+        int levelInt = 0;
+        LevelSeekbar.Level level = GameUtils.getFromJson(
+                GameSharePreference.getInstance().getString(Const.PLAYER_LEVEL,
+                        GameUtils.convertToJson(defaultLevel)),
+                LevelSeekbar.Level.class);
+        switch (level) {
+            case NORMAL:
+                levelInt = 0;
+                break;
+            case MEDIUM:
+                levelInt = 1;
+                break;
+            case HARD:
+                levelInt = 2;
+                break;
+            case VERY_HARD:
+                levelInt = 3;
+                break;
+        }
+        binding.layoutNavigation.levelSeekbar.setProgress(levelInt);
+        binding.layoutNavigation.levelText.setText(level.getName(this));
 
+        colorPickerAdapter = new ColorPickerAdapter(this);
+        colorPickerAdapter.update(Arrays.asList(listColor));
+        binding.layoutNavigation.rcvColorPicker.setAdapter(colorPickerAdapter);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    private ColorModel[] listColor = new ColorModel[] {
+            new ColorModel(R.color.player_blue, false),
+            new ColorModel(R.color.player_brown, false),
+            new ColorModel(R.color.player_pink, false),
+            new ColorModel(R.color.player_red, false),
+            new ColorModel(R.color.player_yellow, false)
+    };
     @Override
     protected void addEvent() {
         gameMenuAdapter.setOnViewItemClickListener(new BaseAdapter.OnViewItemClickListener() {
@@ -106,6 +160,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 GameSharePreference.getInstance().setFloat(Const.PLAYER_SPEED, gamePlayerSpeed);
+            }
+        });
+        binding.layoutNavigation.levelSeekbar.setListener(new LevelSeekbar.OnSeek() {
+            @Override
+            public void onSeekProgress(int pos) {
+
+            }
+
+            @Override
+            public void onStopSeek(LevelSeekbar.Level level) {
+                binding.layoutNavigation.levelText.setText(level.getName(MainActivity.this));
+                GameSharePreference.getInstance().setString(Const.PLAYER_LEVEL, GameUtils.convertToJson(level));
             }
         });
     }

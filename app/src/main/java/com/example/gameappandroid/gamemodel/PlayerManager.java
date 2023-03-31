@@ -1,19 +1,29 @@
 package com.example.gameappandroid.gamemodel;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.Shader;
+import android.graphics.fonts.FontFamily;
 import android.media.MediaPlayer;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.gameappandroid.Const;
 import com.example.gameappandroid.R;
 import com.example.gameappandroid.interfaces.PlayerListener;
 import com.haiprj.base.enums.MediaEnum;
 import com.haiprj.base.models.MediaObject;
+import com.haiprj.base.utils.GameSharePreference;
 import com.haiprj.base.widget.BaseEntity;
 import com.haiprj.base.widget.GameMedia;
 
@@ -23,20 +33,24 @@ import java.util.Arrays;
 @SuppressWarnings("FieldCanBeLocal")
 public class PlayerManager extends BaseEntity {
 
-    private final float ANi_FPS = 60;
+    @SuppressLint("StaticFieldLeak")
+    private static PlayerManager instance;
+    private final float ANi_FPS = 12;
     private final Runnable runnable = new Runnable() {
         @SuppressWarnings("BusyWait")
         @Override
         public void run() {
+            int count = 0;
             double drawInterval = 1000000000f / ANi_FPS;
             double nextTime = System.nanoTime() + drawInterval;
             while (thread != null) {
                 double remainTime = nextTime - System.nanoTime();
                 remainTime /= 1000000;
 
-                animationCount ++;
-                if (animationCount >= bitmaps.length) {
-                    animationCount = 0;
+                count ++;
+                animationCount = count % bitmaps.length;
+                if (count >= 999) {
+                    count = 0;
                 }
 
                 try {
@@ -56,42 +70,84 @@ public class PlayerManager extends BaseEntity {
     protected float playerSpeed;
     protected float speedDown;
     public boolean canDown = true, canUp = false, canLeft = false, canRight = true;
-    public int score = 0;
+    public float score = 0;
 
     protected Bitmap[] bitmaps;
 
-    Thread thread;
+    private Thread thread;
     protected int animationCount = 0;
-    public Bitmap getBitmap() {
-        Bitmap b = bitmaps[animationCount];
-        if (b == null) {
-            b = BitmapFactory.decodeResource(context.getResources(), imageId[animationCount]);
-            bitmaps[animationCount] = Bitmap.createScaledBitmap(b, this.getWidth(), this.getHeight(), true);
-        }
-        return bitmaps[animationCount];
-    }
+    protected float beforeWorldX = 0;
 
+    protected int color;
+    public Paint textPain;
+    private Paint testPaint;
 
-    public PlayerManager(Context context, String name, int[] imageId, int width, int height, float x, float y, float playerSpeed) {
+    private Paint playerPaint;
+
+    private MediaPlayer flyMedia;
+    private boolean isFlySoundReady = true;
+
+    @SuppressLint("NewApi")
+    private PlayerManager(Context context, String name, int[] imageId, int width, int height, float x, float y, float playerSpeed, int color) {
         super(name, imageId, width, height, x, y);
         this.context = context;
         this.playerSpeed = playerSpeed;
+        this.color = color;
+        playerPaint = new Paint();
+        ColorFilter colorFilter = null;
+        if (this.color != -1) {
+            colorFilter = new PorterDuffColorFilter(this.color, PorterDuff.Mode.SRC_ATOP);
+        }
+        if (colorFilter != null) {
+            playerPaint.setColorFilter(colorFilter);
+        }
         bitmaps = new Bitmap[imageId.length];
         for (int i = 0; i < imageId.length; i++) {
             Bitmap b = BitmapFactory.decodeResource(context.getResources(), imageId[i]);
             bitmaps[i] = Bitmap.createScaledBitmap(b, this.getWidth(), this.getHeight(), true);
         }
+        startAnimation();
+        beforeWorldX = this.worldX;
+        textPain = new Paint();
+        textPain.setColor(Color.WHITE);
+        textPain.setTypeface(context.getResources().getFont(R.font.poppins_medium));
+        textPain.setTextSize(50);
+        textPain.setShadowLayer(10f, 10f, 10f, Color.BLUE);
+
+        testPaint = new Paint();
+        testPaint.setColor(Color.RED);
+        testPaint.setStyle(Paint.Style.FILL);
+    }
+    private PlayerManager(Context context) {
+        this.context = context;
+    }
+
+    public static PlayerManager getInstance(Context context, String name, int[] imageId, int width, int height, float x, float y, float playerSpeed, int color) {
+        if (instance == null) instance = new PlayerManager(context, name, imageId, width, height, x, y, playerSpeed, color);
+        return instance;
+    }
+
+    public static PlayerManager getInstance(Context context) {
+        if (instance == null) instance = new PlayerManager(context);
+        return instance;
+    }
+
+    private void startAnimation() {
         thread = new Thread(runnable);
         thread.start();
     }
 
-    public PlayerManager(Context context) {
-        this.context = context;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void setMediaPlayer(Context context) {
-        this.context = context;
+    public void setMediaPlayer() {
+        flyMedia = MediaPlayer.create(this.context, R.raw.fly_sound);
+        flyMedia.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                flyMedia.seekTo(0);
+                isFlySoundReady = true;
+            }
+        });
     }
 
     public float getPlayerSpeed() {
@@ -120,7 +176,7 @@ public class PlayerManager extends BaseEntity {
 
         if (canDown && !canUp){
             //this.worldY += this.playerSpeed;
-            this.y += (this.speedDown * 1.5f) ;
+            this.y += (this.speedDown) ;
 //            this.y += ((float) Math.sin(this.x * Math.PI / 2) + 1) * speedDown;
         }
         if (canUp){
@@ -128,12 +184,18 @@ public class PlayerManager extends BaseEntity {
             setY(this.getY() - this.speedDown);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 //playFlySound();
+                if (GameSharePreference.getInstance().getBoolean(Const.SOUND_CHECK_KEY, false) && isFlySoundReady) {
+                    isFlySoundReady = false;
+                    flyMedia.start();
+                }
             }
 
         }
 
         else {
-            //resetSound();
+//            isFlySoundReady = true;
+//            flyMedia.pause();
+//            flyMedia.seekTo(0);
         }
 
     }
@@ -155,45 +217,6 @@ public class PlayerManager extends BaseEntity {
         }
     }
 
-    private void onDown() {
-        animationCount = 3;
-    }
-
-    @SuppressWarnings("BusyWait")
-    public void onUp(){
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                double drawInterval = 1000000000f / 60;
-                double nextTime = System.nanoTime() + drawInterval;
-                while (canUp) {
-                    double remainTime = nextTime - System.nanoTime();
-                    remainTime /= 1000000;
-                    if (animationCount == 0 || animationCount == 3) {
-                        animationCount = 1;
-                    }
-                    if (animationCount == 1) {
-                        animationCount = 2;
-                    }
-                    if (animationCount == 2) {
-                        animationCount = 1;
-                    }
-                    try {
-                        if (remainTime < 0) {
-                            remainTime = 0;
-                        }
-                        Thread.sleep((long) remainTime);
-                        nextTime += drawInterval;
-                    } catch (InterruptedException ignored) {
-                    }
-                }
-            }
-        });
-        thread.start();
-
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void playFlySound() {
         GameMedia.getInstance(context).playSong(MediaEnum.FLY_SONG);
@@ -207,7 +230,7 @@ public class PlayerManager extends BaseEntity {
     }
 
     public void releaseSound(){
-        GameMedia.getInstance(context).releaseSong(MediaEnum.FLY_SONG);
+        flyMedia.release();
     }
 
     public Bitmap rotateBitmap(Bitmap bitmap, float degrees) {
@@ -216,8 +239,19 @@ public class PlayerManager extends BaseEntity {
         return Bitmap.createBitmap(bitmap, 0, 0, this.width, this.height, matrix, true);
     }
 
+    @SuppressLint("DefaultLocale")
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(bitmaps[animationCount], getX(), getY(), null);
+//        canvas.drawRect(getRectF(), testPaint);
+        canvas.drawBitmap(bitmaps[animationCount], getX(), getY(), playerPaint);
+        if (worldX - beforeWorldX >= 1000f) {
+            playerSpeed += 0.1f;
+            speedDown += 0.1f;
+            beforeWorldX = worldX;
+        }
+    }
+
+    public void onGameOver() {
+        instance = null;
     }
 
 }

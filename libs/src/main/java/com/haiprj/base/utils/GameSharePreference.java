@@ -32,7 +32,7 @@ public class GameSharePreference {
 
 
     @SuppressWarnings("unchecked")
-    private  <T> T get(String key, Object def, Class<T> anonymousClass) {
+    public  <T> T get(String key, Object def, Class<T> anonymousClass) {
         if (anonymousClass == String.class) {
             return (T) mSharedPreferences.getString(key, (String) def);
         } else if (anonymousClass == Boolean.class) {
